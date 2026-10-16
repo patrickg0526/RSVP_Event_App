@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:RSVP_Event_App.Models"
+             x:Class="RSVP_Event_App.Views.EventsPage"
+             Title="Events">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem x:Name="tbiAccount" Clicked="OnAccountClicked" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20,10" RowSpacing="12">
+
+        <Label
+            x:Name="lblWelcome"
+            Grid.Row="0"
+            FontSize="20"
+            FontAttributes="Bold" />
+
+        <!-- Filter bar: All / Attending / Hosting -->
+        <Grid x:Name="gridFilters" Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8">
+            <Button x:Name="btnAll" Grid.Column="0" Text="All" Clicked="OnFilterClicked" />
+            <Button x:Name="btnAttending" Grid.Column="1" Text="Attending" Clicked="OnFilterClicked" />
+            <Button x:Name="btnHosting" Grid.Column="2" Text="Hosting" Clicked="OnFilterClicked" />
+        </Grid>
+
+        <CollectionView
+            x:Name="cvEvents"
+            Grid.Row="2"
+            SelectionMode="Single"
+            SelectionChanged="OnEventSelected">
+            <CollectionView.EmptyView>
+                <Label
+                    Text="No events to display."
+                    HorizontalOptions="Center"
+                    Margin="0,40,0,0"
+                    TextColor="{StaticResource Gray400}" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Event">
+                    <Border
+                        Padding="16,12"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#1E293B}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10">
+                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding Name}" FontSize="18" FontAttributes="Bold" />
+                            <Label Grid.Row="1" Grid.Column="0" Text="{Binding DateDisplay}" FontSize="14" TextColor="{StaticResource Gray400}" />
+                            <Label Grid.Row="2" Grid.Column="0" Text="{Binding HostName, StringFormat='Hosted by {0}'}" FontSize="14" TextColor="{StaticResource Gray400}" />
+                            <Border
+                                Grid.Row="0" Grid.RowSpan="3" Grid.Column="1"
+                                VerticalOptions="Center"
+                                Padding="10,4"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource Accent}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <Label Text="{Binding AttendanceDisplay}" TextColor="White" FontSize="12" />
+                            </Border>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button
+            x:Name="btnAddEvent"
+            Grid.Row="3"
+            Text="+ Add Event"
+            Clicked="OnAddEventClicked"
+            BackgroundColor="{StaticResource Accent}"
+            TextColor="White" />
+    </Grid>
+
+</ContentPage>

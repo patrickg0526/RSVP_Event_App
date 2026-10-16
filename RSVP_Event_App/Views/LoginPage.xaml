@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RSVP_Event_App.Views.LoginPage"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,40"
+            Spacing="16"
+            MaximumWidthRequest="460">
+
+            <Label
+                Text="RSVP"
+                FontSize="48"
+                FontAttributes="Bold"
+                TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                HorizontalOptions="Center" />
+            <Label
+                Text="Plan it. Share it. RSVP."
+                FontSize="16"
+                HorizontalOptions="Center"
+                Margin="0,0,0,20" />
+
+            <Label Text="E-Mail Address" />
+            <Entry
+                x:Name="txtEmail"
+                Placeholder="you@example.com"
+                Keyboard="Email" />
+
+            <Label Text="Password" />
+            <Entry
+                x:Name="txtPassword"
+                Placeholder="Password"
+                IsPassword="True" />
+
+            <Label
+                x:Name="lblError"
+                TextColor="{StaticResource Error}"
+                HorizontalTextAlignment="Center"
+                IsVisible="False" />
+
+            <Button
+                Text="Log In"
+                Clicked="OnLoginClicked" />
+
+            <Button
+                Text="Continue as Guest"
+                Clicked="OnGuestClicked"
+                BackgroundColor="{StaticResource Accent}"
+                TextColor="White" />
+
+            <Button
+                Text="Create an account"
+                Clicked="OnCreateAccountClicked"
+                BackgroundColor="Transparent"
+                TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+
+            <Label
+                Text="Demo login: patrick@rsvpapp.com / Password1"
+                FontSize="12"
+                TextColor="{StaticResource Gray400}"
+                HorizontalOptions="Center" />
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

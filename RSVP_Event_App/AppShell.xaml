@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="RSVP_Event_App.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:RSVP_Event_App.Views"
+    Title="RSVP"
+    FlyoutBehavior="Disabled">
+
+    <!-- Two top-level routes: logging in/out swaps between them so the user
+         cannot press Back from the events list into the login screen. -->
+    <ShellContent
+        Title="Log In"
+        ContentTemplate="{DataTemplate views:LoginPage}"
+        Route="login" />
+
+    <ShellContent
+        Title="Events"
+        ContentTemplate="{DataTemplate views:EventsPage}"
+        Route="events" />
+
+</Shell>

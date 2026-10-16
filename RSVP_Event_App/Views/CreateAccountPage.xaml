@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RSVP_Event_App.Views.CreateAccountPage"
+             Title="Create Account">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,20"
+            Spacing="12"
+            MaximumWidthRequest="460">
+
+            <Label Text="Name" />
+            <Entry x:Name="txtName" Placeholder="Full name" />
+
+            <Label Text="E-Mail Address" />
+            <Entry x:Name="txtEmail" Placeholder="you@example.com" Keyboard="Email" />
+
+            <Label Text="Password" />
+            <Entry x:Name="txtPassword" Placeholder="Password" IsPassword="True" />
+
+            <Label Text="Confirm Password" />
+            <Entry x:Name="txtConfirmPassword" Placeholder="Re-enter password" IsPassword="True" />
+
+            <Label Text="Mobile Phone Number" />
+            <Entry x:Name="txtPhone" Placeholder="555-555-5555" Keyboard="Telephone" />
+
+            <Label
+                x:Name="lblError"
+                TextColor="{StaticResource Error}"
+                HorizontalTextAlignment="Center"
+                IsVisible="False" />
+
+            <Grid ColumnSpacing="10" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    Text="Create Account"
+                    Grid.Column="0"
+                    Clicked="OnCreateClicked" />
+                <Button
+                    Text="Cancel"
+                    Grid.Column="1"
+                    Clicked="OnCancelClicked"
+                    BackgroundColor="{StaticResource Gray500}"
+                    TextColor="White" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

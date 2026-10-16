@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RSVP_Event_App.Views.AddEventPage"
+             Title="Add Event">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30,20" Spacing="12" MaximumWidthRequest="500">
+
+            <Label Text="Host Name" />
+            <Entry x:Name="txtHostName" Placeholder="Name of the person hosting" />
+
+            <Label Text="Event Name" />
+            <Entry x:Name="txtEventName" Placeholder="Event name" />
+
+            <Label Text="Event Address" />
+            <Entry x:Name="txtAddress" Placeholder="Street, City, State" />
+
+            <Label Text="Maximum Allowed Attendees" />
+            <Entry x:Name="txtMaxAttendees" Placeholder="e.g. 25" Keyboard="Numeric" />
+
+            <Label Text="Event Date and Time" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <DatePicker x:Name="dpEventDate" Grid.Column="0" />
+                <TimePicker x:Name="tpEventTime" Grid.Column="1" />
+            </Grid>
+
+            <Label Text="RSVP Deadline" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <DatePicker x:Name="dpDeadlineDate" Grid.Column="0" />
+                <TimePicker x:Name="tpDeadlineTime" Grid.Column="1" />
+            </Grid>
+
+            <Label
+                x:Name="lblError"
+                TextColor="{StaticResource Error}"
+                HorizontalTextAlignment="Center"
+                IsVisible="False" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                <Button Text="Save" Grid.Column="0" Clicked="OnSaveClicked" />
+                <Button
+                    Text="Cancel"
+                    Grid.Column="1"
+                    Clicked="OnCancelClicked"
+                    BackgroundColor="{StaticResource Gray500}"
+                    TextColor="White" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
