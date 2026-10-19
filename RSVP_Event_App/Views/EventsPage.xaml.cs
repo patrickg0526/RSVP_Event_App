@@ -15,11 +15,11 @@ public partial class EventsPage : ContentPage
         InitializeComponent();
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
 
-        bool isGuest = AppData.IsGuest;
+        bool isGuest = Session.IsGuest;
 
         // Upon login show the events the user is attending; guests can only view all events
         if (isGuest)
@@ -30,25 +30,25 @@ public partial class EventsPage : ContentPage
 
         lblWelcome.Text = isGuest
             ? "Browsing as Guest"
-            : $"Welcome, {AppData.CurrentUser!.Name.Split(' ')[0]}!";
+            : $"Welcome, {Session.CurrentUser!.Name.Split(' ')[0]}!";
         tbiAccount.Text = isGuest ? "Log In" : "Log Out";
         btnAttending.IsVisible = !isGuest;
         btnHosting.IsVisible = !isGuest;
         btnAddEvent.IsVisible = !isGuest;
 
-        LoadEvents();
+        await LoadEventsAsync();
     }
 
-    private void LoadEvents()
+    private async Task LoadEventsAsync()
     {
-        IEnumerable<Event> events = _filter switch
+        List<Event> events = _filter switch
         {
-            EventFilter.Attending => AppData.AttendingEvents(AppData.CurrentUser!),
-            EventFilter.Hosting => AppData.HostingEvents(AppData.CurrentUser!),
-            _ => AppData.Events
+            EventFilter.Attending => await App.Database.GetAttendingEventsAsync(Session.CurrentUser!),
+            EventFilter.Hosting => await App.Database.GetHostingEventsAsync(Session.CurrentUser!.Id),
+            _ => await App.Database.GetAllEventsAsync()
         };
 
-        cvEvents.ItemsSource = events.OrderBy(ev => ev.EventDateTime).ToList();
+        cvEvents.ItemsSource = events;
         HighlightFilter();
     }
 
@@ -64,12 +64,12 @@ public partial class EventsPage : ContentPage
         btnHosting.BackgroundColor = _filter == EventFilter.Hosting ? selected : unselected;
     }
 
-    private void OnFilterClicked(object sender, EventArgs e)
+    private async void OnFilterClicked(object sender, EventArgs e)
     {
         _filter = sender == btnAttending ? EventFilter.Attending
                 : sender == btnHosting ? EventFilter.Hosting
                 : EventFilter.All;
-        LoadEvents();
+        await LoadEventsAsync();
     }
 
     private async void OnEventSelected(object sender, SelectionChangedEventArgs e)
@@ -78,7 +78,7 @@ public partial class EventsPage : ContentPage
             return;
 
         cvEvents.SelectedItem = null;
-        await Navigation.PushAsync(new EventDetailsPage(selected));
+        await Navigation.PushAsync(new EventDetailsPage(selected.Id));
     }
 
     private async void OnAddEventClicked(object sender, EventArgs e)
@@ -89,7 +89,7 @@ public partial class EventsPage : ContentPage
     private async void OnAccountClicked(object sender, EventArgs e)
     {
         // Log out (or, for a guest, return to the login screen)
-        AppData.CurrentUser = null;
+        Session.CurrentUser = null;
         await Shell.Current.GoToAsync("//login");
     }
 }

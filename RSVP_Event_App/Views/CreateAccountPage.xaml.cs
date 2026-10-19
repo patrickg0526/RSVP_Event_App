@@ -19,9 +19,16 @@ public partial class CreateAccountPage : ContentPage
             return;
         }
 
-        if (!txtEmail.Text.Contains('@') || !txtEmail.Text.Contains('.'))
+        string email = txtEmail.Text.Trim();
+        if (!email.Contains('@') || !email.Contains('.'))
         {
             ShowError("Please enter a valid e-mail address.");
+            return;
+        }
+
+        if (txtPassword.Text.Length < 8)
+        {
+            ShowError("Password must be at least 8 characters.");
             return;
         }
 
@@ -31,9 +38,14 @@ public partial class CreateAccountPage : ContentPage
             return;
         }
 
-        // Saving the account will be implemented with local storage in Week 3
-        await DisplayAlert("Account Created",
-            $"Welcome, {txtName.Text.Trim()}! You can now log in.", "OK");
+        if (await App.Database.GetUserByEmailAsync(email) is not null)
+        {
+            ShowError("An account with this e-mail address already exists.");
+            return;
+        }
+
+        var user = await App.Database.AddUserAsync(txtName.Text, email, txtPassword.Text, txtPhone.Text);
+        await DisplayAlert("Account Created", $"Welcome, {user.Name}! You can now log in.", "OK");
         await Navigation.PopAsync();
     }
 

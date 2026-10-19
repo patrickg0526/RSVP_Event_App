@@ -20,22 +20,22 @@ public partial class LoginPage : ContentPage
             return;
         }
 
-        // Hard-coded credentials for Week 2; web service authentication comes in Week 4
-        if (!string.Equals(email, AppData.DemoUser.Email, StringComparison.OrdinalIgnoreCase) ||
-            password != AppData.DemoUser.Password)
+        // Credentials are checked against the Users table (salted password hash)
+        var user = await App.Database.ValidateCredentialsAsync(email, password);
+        if (user is null)
         {
             ShowError("Invalid e-mail address or password.");
             return;
         }
 
-        AppData.CurrentUser = AppData.DemoUser;
+        Session.CurrentUser = user;
         ClearForm();
         await Shell.Current.GoToAsync("//events");
     }
 
     private async void OnGuestClicked(object sender, EventArgs e)
     {
-        AppData.CurrentUser = null;
+        Session.CurrentUser = null;
         ClearForm();
         await Shell.Current.GoToAsync("//events");
     }

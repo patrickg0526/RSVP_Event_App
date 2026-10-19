@@ -2,9 +2,15 @@
 
 A .NET MAUI mobile app that lets people create an account, log in (or browse as a guest), view events, see event details, add events, and RSVP.
 
-## Current milestone: UI and page navigation
+## Current milestone: local data storage (SQLite)
 
-All pages and screen-to-screen navigation are in place. Data is hard-coded for now. Saving users, events, and RSVPs comes in later milestones.
+All data is stored on the device in a SQLite database (`RsvpApp.db3`) through a Data Access Layer (`Data/RsvpDatabase.cs`) built on sqlite-net-pcl:
+
+- **Users**: accounts created in the app; passwords are stored as salted PBKDF2 hashes, never in plain text
+- **Events**: each event references the user who hosts it
+- **Rsvps**: links people (registered users or guests) to events; a unique index on EventId + Email prevents duplicate RSVPs
+
+Sample users, events, and RSVPs are seeded on first run so the lists aren't empty.
 
 | Page | Navigation |
 |---|---|
@@ -13,12 +19,13 @@ All pages and screen-to-screen navigation are in place. Data is hard-coded for n
 | **Events** | All / Attending / Hosting filters (guests see All only) · tap an event → Event Details · + Add Event → Add Event · Log Out → Login |
 | **Event Details** | RSVP for this Event → RSVP (disabled when RSVP is closed, the event is full, or you're already attending) · Back → Events |
 | **Add Event** | Save (validates all fields, future date, deadline before event) → Events · Cancel → Events |
-| **RSVP** | Pre-filled for logged-in users, blank for guests · Submit RSVP (validates all fields) → Event Details · Cancel → Event Details |
+| **RSVP** | Pre-filled for logged-in users, blank for guests · Submit RSVP (validates all fields, deadline, capacity, no duplicates) → Event Details · Cancel → Event Details |
 
-**Demo login:** `patrick@rsvpapp.com` / `Password1`
+**Demo login:** `patrick@rsvpapp.com` / `Password1` (other seeded users: sarah@, marcus@, linda@example.com, same password)
 
 ## Project structure
 
 - `Views/`: XAML pages and code-behind
-- `Models/`: `User` and `Event`
-- `Services/AppData.cs`: hard-coded sample data and the current session
+- `Models/`: `User`, `Event`, and `Rsvp` table classes
+- `Data/`: `RsvpDatabase` (DAL with CRUD, login validation, RSVP rules, and seed data) and `DatabaseConstants`
+- `Services/`: `Session` (current user) and `PasswordHasher`

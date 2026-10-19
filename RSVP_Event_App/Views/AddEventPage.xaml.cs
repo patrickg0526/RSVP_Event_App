@@ -1,3 +1,4 @@
+using RSVP_Event_App.Models;
 using RSVP_Event_App.Services;
 
 namespace RSVP_Event_App.Views;
@@ -9,7 +10,7 @@ public partial class AddEventPage : ContentPage
         InitializeComponent();
 
         // Default the host to the logged-in user and the dates to sensible future values
-        txtHostName.Text = AppData.CurrentUser?.Name ?? string.Empty;
+        txtHostName.Text = Session.CurrentUser?.Name ?? string.Empty;
         dpEventDate.MinimumDate = DateTime.Today;
         dpDeadlineDate.MinimumDate = DateTime.Today;
         dpEventDate.Date = DateTime.Today.AddDays(14);
@@ -50,8 +51,19 @@ public partial class AddEventPage : ContentPage
             return;
         }
 
-        // Saving the event will be implemented with local storage in Week 3
-        await DisplayAlert("Event Saved", $"\"{txtEventName.Text.Trim()}\" has been created.", "OK");
+        var ev = new Event
+        {
+            HostUserId = Session.CurrentUser!.Id,
+            HostName = txtHostName.Text.Trim(),
+            Name = txtEventName.Text.Trim(),
+            Address = txtAddress.Text.Trim(),
+            MaxAttendees = max,
+            EventDateTime = eventDateTime,
+            RsvpDeadline = deadline
+        };
+        await App.Database.AddEventAsync(ev);
+
+        await DisplayAlert("Event Saved", $"\"{ev.Name}\" has been created.", "OK");
         await Navigation.PopAsync();
     }
 

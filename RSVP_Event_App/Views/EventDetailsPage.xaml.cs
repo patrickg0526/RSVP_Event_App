@@ -5,17 +5,27 @@ namespace RSVP_Event_App.Views;
 
 public partial class EventDetailsPage : ContentPage
 {
-    private readonly Event _event;
+    private readonly int _eventId;
+    private Event? _event;
 
-    public EventDetailsPage(Event selectedEvent)
+    public EventDetailsPage(int eventId)
     {
         InitializeComponent();
-        _event = selectedEvent;
+        _eventId = eventId;
     }
 
-    protected override void OnAppearing()
+    // Reload from the database every time the page appears so new RSVPs show up immediately
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        _event = await App.Database.GetEventAsync(_eventId);
+        if (_event is null)
+        {
+            await DisplayAlert("Not Found", "This event no longer exists.", "OK");
+            await Navigation.PopAsync();
+            return;
+        }
 
         lblName.Text = _event.Name;
         lblHost.Text = _event.HostName;
@@ -25,25 +35,26 @@ public partial class EventDetailsPage : ContentPage
         lblMax.Text = _event.MaxAttendees.ToString();
         lblCurrent.Text = _event.CurrentAttendees.ToString();
 
+        var rsvps = await App.Database.GetRsvpsForEventAsync(_eventId);
         stackAttendees.Children.Clear();
-        if (_event.AttendeeNames.Count == 0)
+        if (rsvps.Count == 0)
         {
             stackAttendees.Children.Add(new Label { Text = "No one has RSVP'd yet." });
         }
-        foreach (string name in _event.AttendeeNames)
+        foreach (var rsvp in rsvps)
         {
-            stackAttendees.Children.Add(new Label { Text = "• " + name });
+            stackAttendees.Children.Add(new Label { Text = "• " + rsvp.Name });
         }
 
-        UpdateRsvpState();
+        await UpdateRsvpStateAsync();
     }
 
-    private void UpdateRsvpState()
+    private async Task UpdateRsvpStateAsync()
     {
-        bool alreadyAttending = AppData.CurrentUser is { } user &&
-            _event.AttendeeEmails.Contains(user.Email, StringComparer.OrdinalIgnoreCase);
+        bool alreadyAttending = Session.CurrentUser is { } user &&
+            await App.Database.HasRsvpAsync(_eventId, user.Email);
 
-        string? reason = _event.IsRsvpClosed ? "RSVP is closed for this event."
+        string? reason = _event!.IsRsvpClosed ? "RSVP is closed for this event."
                        : _event.IsFull ? "This event is full."
                        : alreadyAttending ? "You're attending this event."
                        : null;
@@ -55,6 +66,6 @@ public partial class EventDetailsPage : ContentPage
 
     private async void OnRsvpClicked(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new RsvpPage(_event));
+        await Navigation.PushAsync(new RsvpPage(_event!));
     }
 }
