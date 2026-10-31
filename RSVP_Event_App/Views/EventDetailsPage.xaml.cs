@@ -1,3 +1,4 @@
+using RSVP_Event_App.Data;
 using RSVP_Event_App.Models;
 using RSVP_Event_App.Services;
 
@@ -19,7 +20,19 @@ public partial class EventDetailsPage : ContentPage
     {
         base.OnAppearing();
 
-        _event = await App.Database.GetEventAsync(_eventId);
+        List<Rsvp> rsvps;
+        try
+        {
+            _event = await App.Database.GetEventAsync(_eventId);
+            rsvps = await App.Database.GetRsvpsForEventAsync(_eventId);
+        }
+        catch (ServiceUnavailableException ex)
+        {
+            await DisplayAlert("Connection Problem", ex.Message, "OK");
+            await Navigation.PopAsync();
+            return;
+        }
+
         if (_event is null)
         {
             await DisplayAlert("Not Found", "This event no longer exists.", "OK");
@@ -35,7 +48,6 @@ public partial class EventDetailsPage : ContentPage
         lblMax.Text = _event.MaxAttendees.ToString();
         lblCurrent.Text = _event.CurrentAttendees.ToString();
 
-        var rsvps = await App.Database.GetRsvpsForEventAsync(_eventId);
         stackAttendees.Children.Clear();
         if (rsvps.Count == 0)
         {
@@ -51,8 +63,16 @@ public partial class EventDetailsPage : ContentPage
 
     private async Task UpdateRsvpStateAsync()
     {
-        bool alreadyAttending = Session.CurrentUser is { } user &&
-            await App.Database.HasRsvpAsync(_eventId, user.Email);
+        bool alreadyAttending = false;
+        try
+        {
+            alreadyAttending = Session.CurrentUser is { } user &&
+                await App.Database.HasRsvpAsync(_eventId, user.Email);
+        }
+        catch (ServiceUnavailableException)
+        {
+            // Leave the RSVP button state based on the event's own rules; submitting will report the problem
+        }
 
         string? reason = _event!.IsRsvpClosed ? "RSVP is closed for this event."
                        : _event.IsFull ? "This event is full."

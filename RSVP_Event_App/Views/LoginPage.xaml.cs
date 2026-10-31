@@ -1,3 +1,5 @@
+using RSVP_Event_App.Data;
+using RSVP_Event_App.Models;
 using RSVP_Event_App.Services;
 
 namespace RSVP_Event_App.Views;
@@ -20,22 +22,32 @@ public partial class LoginPage : ContentPage
             return;
         }
 
-        // Credentials are checked against the Users table (salted password hash)
-        var user = await App.Database.ValidateCredentialsAsync(email, password);
+        // Credentials are verified by the RSVP web service using Basic Authentication
+        User? user;
+        try
+        {
+            user = await App.Database.ValidateCredentialsAsync(email, password);
+        }
+        catch (ServiceUnavailableException ex)
+        {
+            ShowError(ex.Message);
+            return;
+        }
+
         if (user is null)
         {
             ShowError("Invalid e-mail address or password.");
             return;
         }
 
-        Session.CurrentUser = user;
+        Session.SignIn(user, password);
         ClearForm();
         await Shell.Current.GoToAsync("//events");
     }
 
     private async void OnGuestClicked(object sender, EventArgs e)
     {
-        Session.CurrentUser = null;
+        Session.SignOut();
         ClearForm();
         await Shell.Current.GoToAsync("//events");
     }

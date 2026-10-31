@@ -1,3 +1,4 @@
+using RSVP_Event_App.Data;
 using RSVP_Event_App.Models;
 using RSVP_Event_App.Services;
 
@@ -61,9 +62,24 @@ public partial class AddEventPage : ContentPage
             EventDateTime = eventDateTime,
             RsvpDeadline = deadline
         };
-        await App.Database.AddEventAsync(ev);
+        RsvpResult result;
+        try
+        {
+            result = await App.Database.AddEventAsync(ev);
+        }
+        catch (ServiceUnavailableException ex)
+        {
+            ShowError(ex.Message);
+            return;
+        }
 
-        await DisplayAlert("Event Saved", $"\"{ev.Name}\" has been created.", "OK");
+        if (!result.Success)
+        {
+            ShowError(result.Message);
+            return;
+        }
+
+        await DisplayAlert("Event Saved", result.Message, "OK");
         await Navigation.PopAsync();
     }
 

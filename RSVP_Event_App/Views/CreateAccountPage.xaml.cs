@@ -1,3 +1,6 @@
+using RSVP_Event_App.Data;
+using RSVP_Event_App.Models;
+
 namespace RSVP_Event_App.Views;
 
 public partial class CreateAccountPage : ContentPage
@@ -38,13 +41,25 @@ public partial class CreateAccountPage : ContentPage
             return;
         }
 
-        if (await App.Database.GetUserByEmailAsync(email) is not null)
+        // The web service saves the account (and rejects duplicate e-mail addresses)
+        User? user;
+        string message;
+        try
         {
-            ShowError("An account with this e-mail address already exists.");
+            (user, message) = await App.Database.AddUserAsync(txtName.Text, email, txtPassword.Text, txtPhone.Text);
+        }
+        catch (ServiceUnavailableException ex)
+        {
+            ShowError(ex.Message);
             return;
         }
 
-        var user = await App.Database.AddUserAsync(txtName.Text, email, txtPassword.Text, txtPhone.Text);
+        if (user is null)
+        {
+            ShowError(message);
+            return;
+        }
+
         await DisplayAlert("Account Created", $"Welcome, {user.Name}! You can now log in.", "OK");
         await Navigation.PopAsync();
     }

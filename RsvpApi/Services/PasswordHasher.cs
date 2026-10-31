@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace RSVP_Event_App.Services;
+namespace RsvpApi.Services;
 
 // Salted PBKDF2 hashing so plain-text passwords are never stored in the database
 public static class PasswordHasher

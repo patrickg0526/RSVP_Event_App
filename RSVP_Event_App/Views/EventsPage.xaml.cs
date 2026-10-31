@@ -1,3 +1,4 @@
+using RSVP_Event_App.Data;
 using RSVP_Event_App.Models;
 using RSVP_Event_App.Services;
 
@@ -41,15 +42,23 @@ public partial class EventsPage : ContentPage
 
     private async Task LoadEventsAsync()
     {
-        List<Event> events = _filter switch
-        {
-            EventFilter.Attending => await App.Database.GetAttendingEventsAsync(Session.CurrentUser!),
-            EventFilter.Hosting => await App.Database.GetHostingEventsAsync(Session.CurrentUser!.Id),
-            _ => await App.Database.GetAllEventsAsync()
-        };
-
-        cvEvents.ItemsSource = events;
         HighlightFilter();
+        try
+        {
+            List<Event> events = _filter switch
+            {
+                EventFilter.Attending => await App.Database.GetAttendingEventsAsync(Session.CurrentUser!),
+                EventFilter.Hosting => await App.Database.GetHostingEventsAsync(Session.CurrentUser!.Id),
+                _ => await App.Database.GetAllEventsAsync()
+            };
+
+            cvEvents.ItemsSource = events;
+        }
+        catch (ServiceUnavailableException ex)
+        {
+            cvEvents.ItemsSource = null;
+            await DisplayAlert("Connection Problem", ex.Message, "OK");
+        }
     }
 
     private void HighlightFilter()
@@ -89,7 +98,7 @@ public partial class EventsPage : ContentPage
     private async void OnAccountClicked(object sender, EventArgs e)
     {
         // Log out (or, for a guest, return to the login screen)
-        Session.CurrentUser = null;
+        Session.SignOut();
         await Shell.Current.GoToAsync("//login");
     }
 }

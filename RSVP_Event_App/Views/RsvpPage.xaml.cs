@@ -1,3 +1,4 @@
+using RSVP_Event_App.Data;
 using RSVP_Event_App.Models;
 using RSVP_Event_App.Services;
 
@@ -40,14 +41,23 @@ public partial class RsvpPage : ContentPage
             return;
         }
 
-        var result = await App.Database.AddRsvpAsync(new Rsvp
+        RsvpResult result;
+        try
         {
-            EventId = _event.Id,
-            UserId = Session.CurrentUser?.Id,
-            Name = txtName.Text.Trim(),
-            Email = txtEmail.Text.Trim(),
-            Phone = txtPhone.Text.Trim()
-        });
+            result = await App.Database.AddRsvpAsync(new Rsvp
+            {
+                EventId = _event.Id,
+                UserId = Session.CurrentUser?.Id,
+                Name = txtName.Text.Trim(),
+                Email = txtEmail.Text.Trim(),
+                Phone = txtPhone.Text.Trim()
+            });
+        }
+        catch (ServiceUnavailableException ex)
+        {
+            ShowError(ex.Message);
+            return;
+        }
 
         if (!result.Success)
         {
