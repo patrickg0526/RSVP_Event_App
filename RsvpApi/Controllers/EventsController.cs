@@ -55,6 +55,8 @@ public class EventsController : ControllerBase
             return BadRequest("Maximum attendees must be a whole number greater than zero.");
         if (request.EventDateTime <= DateTime.Now)
             return BadRequest("The event date and time must be in the future.");
+        if (request.RsvpDeadline <= DateTime.Now)
+            return BadRequest("The RSVP deadline must be in the future.");
         if (request.RsvpDeadline > request.EventDateTime)
             return BadRequest("The RSVP deadline must be on or before the event date and time.");
 

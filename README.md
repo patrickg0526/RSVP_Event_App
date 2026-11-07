@@ -6,11 +6,11 @@ A .NET MAUI mobile app that lets people create an account, log in (or browse as 
 
 ```
 RSVP_Event_App (MAUI)  --HTTP/JSON-->  RsvpApi (ASP.NET Core Web API)  -->  SQLite (RsvpApi.db3)
-   Views -> Data/RsvpDatabase           Controllers -> Data/RsvpRepository
+   Views -> ViewModels -> Data/RsvpDatabase    Controllers -> Data/RsvpRepository
 ```
 
 - **RsvpApi** owns all data. It stores Users, Events, and Rsvps in SQLite on the server, hashes passwords with salted PBKDF2, and enforces the RSVP rules (deadline, capacity, no duplicate RSVPs).
-- **RSVP_Event_App** calls the API through `Data/RsvpDatabase.cs`, the same data access class used for local storage in Week 3, now rewritten to use `HttpClient` + Newtonsoft.Json. The pages barely changed.
+- **RSVP_Event_App** follows **MVVM**. Views (XAML) contain layout and data binding only, View Models in `ViewModels/` hold the logic and commands, and `Data/RsvpDatabase.cs` is the data access layer that calls the API with `HttpClient` + Newtonsoft.Json. Views, View Models, and the data access class are registered in `MauiProgram` and supplied through dependency injection.
 - **Authentication**: user credentials are verified by the web service using **HTTP Basic Authentication** (`GET /api/Users/me`). After login the app keeps the credentials in memory only and sends them with Basic Authentication for user-specific requests (Attending / Hosting lists, adding events, and RSVPing with the user's saved credentials). Guests can browse and RSVP by entering their details.
 
 ## API endpoints (http://localhost:5090, Swagger at `/swagger`)
@@ -42,6 +42,12 @@ RSVP_Event_App (MAUI)  --HTTP/JSON-->  RsvpApi (ASP.NET Core Web API)  -->  SQLi
 ## Running
 
 1. Start the web service: `dotnet run --launch-profile http` in `RsvpApi` (sample users, events, and RSVPs are created on first run).
-2. Run `RSVP_Event_App` on Windows Machine.
+2. Run `RSVP_Event_App` on Windows Machine or the Android emulator. On Android the app reaches the service at `http://10.0.2.2:5090`.
 
-**Demo login:** `patrick@rsvpapp.com` / `Password1` (other sample users: sarah@, marcus@, linda@example.com, same password)
+**Test login:** `patrick@rsvpapp.com` / `Password1` (other sample users: sarah@, marcus@, linda@example.com, same password)
+
+## Android package
+
+`dotnet publish RSVP_Event_App/RSVP_Event_App.csproj -f net9.0-android -c Release -p:AndroidPackageFormat=apk`
+
+The web service address is for local development. A production release needs a hosted HTTPS service and a production signing key.

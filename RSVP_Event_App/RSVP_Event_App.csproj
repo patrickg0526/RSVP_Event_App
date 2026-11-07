@@ -24,7 +24,7 @@
 		<ApplicationTitle>RSVP</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.rsvp_event_app</ApplicationId>
+		<ApplicationId>com.patrickgonzalez.rsvpevent</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>

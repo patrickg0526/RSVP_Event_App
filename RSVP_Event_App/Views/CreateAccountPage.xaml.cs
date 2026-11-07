@@ -1,77 +1,12 @@
-using RSVP_Event_App.Data;
-using RSVP_Event_App.Models;
+using RSVP_Event_App.ViewModels;
 
 namespace RSVP_Event_App.Views;
 
 public partial class CreateAccountPage : ContentPage
 {
-    public CreateAccountPage()
+    public CreateAccountPage(CreateAccountViewModel viewModel)
     {
         InitializeComponent();
-    }
-
-    private async void OnCreateClicked(object sender, EventArgs e)
-    {
-        if (string.IsNullOrWhiteSpace(txtName.Text) ||
-            string.IsNullOrWhiteSpace(txtEmail.Text) ||
-            string.IsNullOrWhiteSpace(txtPassword.Text) ||
-            string.IsNullOrWhiteSpace(txtConfirmPassword.Text) ||
-            string.IsNullOrWhiteSpace(txtPhone.Text))
-        {
-            ShowError("Please fill in all fields.");
-            return;
-        }
-
-        string email = txtEmail.Text.Trim();
-        if (!email.Contains('@') || !email.Contains('.'))
-        {
-            ShowError("Please enter a valid e-mail address.");
-            return;
-        }
-
-        if (txtPassword.Text.Length < 8)
-        {
-            ShowError("Password must be at least 8 characters.");
-            return;
-        }
-
-        if (txtPassword.Text != txtConfirmPassword.Text)
-        {
-            ShowError("Passwords do not match.");
-            return;
-        }
-
-        // The web service saves the account (and rejects duplicate e-mail addresses)
-        User? user;
-        string message;
-        try
-        {
-            (user, message) = await App.Database.AddUserAsync(txtName.Text, email, txtPassword.Text, txtPhone.Text);
-        }
-        catch (ServiceUnavailableException ex)
-        {
-            ShowError(ex.Message);
-            return;
-        }
-
-        if (user is null)
-        {
-            ShowError(message);
-            return;
-        }
-
-        await DisplayAlert("Account Created", $"Welcome, {user.Name}! You can now log in.", "OK");
-        await Navigation.PopAsync();
-    }
-
-    private async void OnCancelClicked(object sender, EventArgs e)
-    {
-        await Navigation.PopAsync();
-    }
-
-    private void ShowError(string message)
-    {
-        lblError.Text = message;
-        lblError.IsVisible = true;
+        BindingContext = viewModel;
     }
 }

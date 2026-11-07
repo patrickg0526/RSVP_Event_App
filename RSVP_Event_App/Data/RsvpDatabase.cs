@@ -14,11 +14,16 @@ public class ServiceUnavailableException(Exception inner)
     : Exception("The RSVP service could not be reached. Make sure the RsvpApi web service is running.", inner);
 
 // Data Access Layer. In Week 3 this class read and wrote a local SQLite database;
-// it now calls the RsvpApi web service instead, keeping the same methods so the pages barely changed.
+// it now calls the RsvpApi web service instead. View Models receive this class through dependency injection.
 public class RsvpDatabase
 {
-    // Must match the applicationUrl in RsvpApi/Properties/launchSettings.json
+    // Must match the port of the applicationUrl in RsvpApi/Properties/launchSettings.json.
+    // On the Android emulator localhost is the device itself; 10.0.2.2 reaches the host computer.
+#if ANDROID
+    public const string BaseAddress = "http://10.0.2.2:5090/";
+#else
     public const string BaseAddress = "http://localhost:5090/";
+#endif
 
     private static readonly HttpClient Client = new() { BaseAddress = new Uri(BaseAddress), Timeout = TimeSpan.FromSeconds(15) };
 

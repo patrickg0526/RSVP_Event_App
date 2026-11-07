@@ -16,16 +16,21 @@ public static class Session
 
     public static bool IsGuest => CurrentUser is null;
 
+    // Changes on every log in and log out, so pages can tell that a new session has started
+    public static int Version { get; private set; }
+
     public static void SignIn(User user, string password)
     {
         CurrentUser = user;
         _password = password;
+        Version++;
     }
 
     public static void SignOut()
     {
         CurrentUser = null;
         _password = null;
+        Version++;
     }
 
     public static AuthenticationHeaderValue? AuthorizationHeader =>
